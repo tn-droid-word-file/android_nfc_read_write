@@ -37,16 +37,18 @@ public class MainActivity extends Activity {
     TextView tvNFCContent;
     TextView message;
     Button btnWrite;
+    Button btnWriteDog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context = this;
-
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         tvNFCContent = (TextView) findViewById(R.id.nfc_contents);
-        message = (TextView) findViewById(R.id.edit_message);
+        //message = (TextView) findViewById(R.id.edit_message);
         btnWrite = (Button) findViewById(R.id.button);
+        btnWriteDog = (Button) findViewById(R.id.button_dog);
 
         btnWrite.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -55,7 +57,8 @@ public class MainActivity extends Activity {
                     if (myTag == null) {
                         Toast.makeText(context, ERROR_DETECTED, Toast.LENGTH_LONG).show();
                     } else {
-                        write(message.getText().toString(), myTag);
+                        //write(message.getText().toString(), myTag);
+                        write("cat,blue", myTag);
                         Toast.makeText(context, WRITE_SUCCESS, Toast.LENGTH_LONG ).show();
                     }
                 } catch (IOException e) {
@@ -68,6 +71,26 @@ public class MainActivity extends Activity {
             }
         });
 
+        btnWriteDog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    if (myTag == null) {
+                        Toast.makeText(context, ERROR_DETECTED, Toast.LENGTH_LONG).show();
+                    } else {
+                        //write(message.getText().toString(), myTag);
+                        write("dog,red", myTag);
+                        Toast.makeText(context, WRITE_SUCCESS, Toast.LENGTH_LONG ).show();
+                    }
+                } catch (IOException e) {
+                    Toast.makeText(context, WRITE_ERROR, Toast.LENGTH_LONG ).show();
+                    e.printStackTrace();
+                } catch (FormatException e) {
+                    Toast.makeText(context, WRITE_ERROR, Toast.LENGTH_LONG ).show();
+                    e.printStackTrace();
+                }
+            }
+        });
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         if (nfcAdapter == null) {
             // Stop here, we definitely need NFC
@@ -82,6 +105,19 @@ public class MainActivity extends Activity {
         writeTagFilters = new IntentFilter[] { tagDetected };
     }
 
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+        }
+    }
 
     /******************************************************************************
      **********************************Read From NFC Tag***************************
