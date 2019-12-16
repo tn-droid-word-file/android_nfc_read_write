@@ -16,8 +16,11 @@ import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import android.widget.ViewFlipper;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -36,8 +39,22 @@ public class MainActivity extends Activity {
 
     TextView tvNFCContent;
     TextView message;
-    Button btnWrite;
-    Button btnWriteDog;
+
+    Button btnRed;
+    Button btnBlue;
+    Button btnGreen;
+
+    ImageButton btnImageCat;
+    ImageButton btnImageDog;
+    ImageButton btnImageBird;
+    ViewFlipper viewFlipper;
+
+    String nfc_write_tag;
+    String nfc_animal_tag;
+    String nfc_color_tag;
+
+    int select_animal;
+    int select_color;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,30 +64,79 @@ public class MainActivity extends Activity {
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         tvNFCContent = (TextView) findViewById(R.id.nfc_contents);
         //message = (TextView) findViewById(R.id.edit_message);
-        btnWrite = (Button) findViewById(R.id.button);
-        btnWriteDog = (Button) findViewById(R.id.button_dog);
+        btnImageCat = (ImageButton) findViewById(R.id.button_cat);
+        btnImageDog = (ImageButton) findViewById(R.id.button_dog);
+        btnImageBird = (ImageButton) findViewById(R.id.button_bird);
 
-        btnWrite.setOnClickListener(new View.OnClickListener() {
+        viewFlipper = (ViewFlipper) findViewById(R.id.nfcFlipper);
+        btnRed = (Button) findViewById(R.id.button_red);
+        btnGreen = (Button) findViewById(R.id.button_green);
+        btnBlue = (Button) findViewById(R.id.button_blue);
+
+        btnRed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    if (myTag == null) {
-                        Toast.makeText(context, ERROR_DETECTED, Toast.LENGTH_LONG).show();
-                    } else {
-                        //write(message.getText().toString(), myTag);
-                        write("cat,blue", myTag);
-                        Toast.makeText(context, WRITE_SUCCESS, Toast.LENGTH_LONG ).show();
-                    }
-                } catch (IOException e) {
-                    Toast.makeText(context, WRITE_ERROR, Toast.LENGTH_LONG ).show();
-                    e.printStackTrace();
-                } catch (FormatException e) {
-                    Toast.makeText(context, WRITE_ERROR, Toast.LENGTH_LONG ).show();
-                    e.printStackTrace();
-                }
+                // or you can switch selecting the layout that you want to display
+                viewFlipper.setDisplayedChild(1);
+                viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.firstLayout)));
+                select_color = 0;
+                FromUIWriteNFC(select_animal,select_color);
             }
         });
 
+        btnGreen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // or you can switch selecting the layout that you want to display
+                viewFlipper.setDisplayedChild(1);
+                viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.firstLayout)));
+                select_color = 1;
+                FromUIWriteNFC(select_animal,select_color);
+            }
+        });
+
+        btnBlue.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // or you can switch selecting the layout that you want to display
+                viewFlipper.setDisplayedChild(1);
+                viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.firstLayout)));
+                select_color = 2;
+                FromUIWriteNFC(select_animal,select_color);
+            }
+        });
+
+        btnImageCat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // or you can switch selecting the layout that you want to display
+                viewFlipper.setDisplayedChild(1);
+                viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.secondLayout)));
+                select_animal = 0;
+            }
+        });
+
+        btnImageDog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // or you can switch selecting the layout that you want to display
+                viewFlipper.setDisplayedChild(1);
+                viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.secondLayout)));
+                select_animal = 1;
+            }
+        });
+
+        btnImageBird.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // or you can switch selecting the layout that you want to display
+                viewFlipper.setDisplayedChild(1);
+                viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.secondLayout)));
+                select_animal = 2;
+            }
+        });
+
+/*
         btnWriteDog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -91,6 +157,8 @@ public class MainActivity extends Activity {
                 }
             }
         });
+ */
+
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         if (nfcAdapter == null) {
             // Stop here, we definitely need NFC
@@ -119,9 +187,55 @@ public class MainActivity extends Activity {
         }
     }
 
-    /******************************************************************************
-     **********************************Read From NFC Tag***************************
-     ******************************************************************************/
+    private void FromUIWriteNFC(int nfc_animal, int nfc_color) {
+        switch(nfc_animal)
+        {
+            case 0:
+                nfc_animal_tag = "cat";
+                break;
+            case 1:
+                nfc_animal_tag = "dog";
+                break;
+            case 2:
+                nfc_animal_tag = "bird";
+                break;
+        }
+
+        switch(nfc_animal)
+        {
+            case 0:
+                nfc_color_tag = "red";
+                break;
+            case 1:
+                nfc_color_tag = "green";
+                break;
+            case 2:
+                nfc_color_tag = "blue";
+                break;
+        }
+
+        nfc_write_tag = nfc_animal_tag + "," + nfc_color_tag;
+
+        try {
+            if (myTag == null) {
+                Toast.makeText(context, ERROR_DETECTED, Toast.LENGTH_LONG).show();
+            } else {
+                //write(message.getText().toString(), myTag);
+                write(nfc_write_tag, myTag);
+                Toast.makeText(context, WRITE_SUCCESS, Toast.LENGTH_LONG ).show();
+            }
+        } catch (IOException e) {
+            Toast.makeText(context, WRITE_ERROR, Toast.LENGTH_LONG ).show();
+            e.printStackTrace();
+        } catch (FormatException e) {
+            Toast.makeText(context, WRITE_ERROR, Toast.LENGTH_LONG ).show();
+            e.printStackTrace();
+        }
+    }
+
+        /******************************************************************************
+         **********************************Read From NFC Tag***************************
+         ******************************************************************************/
     private void readFromIntent(Intent intent) {
         String action = intent.getAction();
         if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)
