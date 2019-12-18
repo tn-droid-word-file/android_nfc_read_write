@@ -2,9 +2,12 @@ package com.example.peng.nfcreadwrite;
 
 import android.app.Activity;
 import android.app.PendingIntent;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.nfc.FormatException;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -24,6 +27,7 @@ import android.widget.ViewFlipper;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 
 public class MainActivity extends Activity {
 
@@ -52,6 +56,9 @@ public class MainActivity extends Activity {
     String nfc_write_tag;
     String nfc_animal_tag;
     String nfc_color_tag;
+
+    String write_log;
+    String msg_log;
 
     int select_animal;
     int select_color;
@@ -187,6 +194,26 @@ public class MainActivity extends Activity {
         }
     }
 
+    // Show Message Box On Screen
+    private void openOptionsDialog()
+    {
+        msg_log = nfc_write_tag + " written to the NFC tag successfully!";
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setMessage(msg_log)
+                .setPositiveButton("OK", null)
+                .create();
+        dialog.show();
+
+        TextView msgTxt = (TextView) dialog.findViewById(android.R.id.message);
+        msgTxt.setTextSize(64.0f);
+        Button positiveButton = ((AlertDialog)dialog).getButton(DialogInterface.BUTTON_POSITIVE);
+        positiveButton.setTextSize(64.0f);
+        positiveButton.setTextColor(Color.rgb(0,0, 0));
+        positiveButton.setBackgroundColor(Color.rgb(128,128, 128));
+
+    }
+
+    // Write label to NFC tag
     private void FromUIWriteNFC(int nfc_animal, int nfc_color) {
         switch(nfc_animal)
         {
@@ -201,7 +228,7 @@ public class MainActivity extends Activity {
                 break;
         }
 
-        switch(nfc_animal)
+        switch(select_color)
         {
             case 0:
                 nfc_color_tag = "red";
@@ -222,7 +249,9 @@ public class MainActivity extends Activity {
             } else {
                 //write(message.getText().toString(), myTag);
                 write(nfc_write_tag, myTag);
-                Toast.makeText(context, WRITE_SUCCESS, Toast.LENGTH_LONG ).show();
+                //Toast.makeText(context, WRITE_SUCCESS, Toast.LENGTH_LONG ).show();
+                write_log = WRITE_SUCCESS;
+                openOptionsDialog();
             }
         } catch (IOException e) {
             Toast.makeText(context, WRITE_ERROR, Toast.LENGTH_LONG ).show();
@@ -269,7 +298,8 @@ public class MainActivity extends Activity {
             Log.e("UnsupportedEncoding", e.toString());
         }
 
-        tvNFCContent.setText("NFC Content: " + text);
+        //tvNFCContent.setText("NFC Content: " + text);
+        Toast.makeText(context, text, Toast.LENGTH_LONG ).show();
     }
 
 
