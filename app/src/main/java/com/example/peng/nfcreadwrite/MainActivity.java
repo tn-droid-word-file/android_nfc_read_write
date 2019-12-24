@@ -50,7 +50,7 @@ public class MainActivity extends Activity {
 
     ImageButton btnImageCat;
     ImageButton btnImageDog;
-    ImageButton btnImageBird;
+    ImageButton btnImageCow;
     ViewFlipper viewFlipper;
 
     String nfc_write_tag;
@@ -62,6 +62,10 @@ public class MainActivity extends Activity {
 
     int select_animal;
     int select_color;
+    int to_do_write_nfc;
+
+    AlertDialog nfc_dialog = null;
+    AlertDialog wait_dialog = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -73,7 +77,7 @@ public class MainActivity extends Activity {
         //message = (TextView) findViewById(R.id.edit_message);
         btnImageCat = (ImageButton) findViewById(R.id.button_cat);
         btnImageDog = (ImageButton) findViewById(R.id.button_dog);
-        btnImageBird = (ImageButton) findViewById(R.id.button_bird);
+        btnImageCow = (ImageButton) findViewById(R.id.button_cow);
 
         viewFlipper = (ViewFlipper) findViewById(R.id.nfcFlipper);
         btnRed = (Button) findViewById(R.id.button_red);
@@ -133,7 +137,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        btnImageBird.setOnClickListener(new View.OnClickListener() {
+        btnImageCow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // or you can switch selecting the layout that you want to display
@@ -194,19 +198,68 @@ public class MainActivity extends Activity {
         }
     }
 
+
+    // Show Write NTag Message Box On Screen
+    private void openWaitNFCDialog()
+    {
+        wait_dialog = new AlertDialog.Builder(this)
+                .setMessage(msg_log)
+                .setNegativeButton("Exit",null)
+                .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    public void onDismiss(DialogInterface dialog) {
+                        if(to_do_write_nfc == 1)
+                        {
+                            try {
+                                if (myTag == null) {
+                                    Toast.makeText(context, ERROR_DETECTED, Toast.LENGTH_LONG).show();
+                                } else {
+                                    //write(message.getText().toString(), myTag);
+                                    write(nfc_write_tag, myTag);
+                                    //Toast.makeText(context, WRITE_SUCCESS, Toast.LENGTH_LONG ).show();
+                                    write_log = WRITE_SUCCESS;
+                                    msg_log = nfc_write_tag + " written to the NFC tag successfully!";
+                                    if(nfc_dialog == null)
+                                        openOptionsDialog();
+                                    else {
+                                        nfc_dialog.setMessage(msg_log);
+                                        nfc_dialog.show();
+                                    }
+                                }
+                            } catch (IOException e) {
+                                Toast.makeText(context, WRITE_ERROR, Toast.LENGTH_LONG ).show();
+                                e.printStackTrace();
+                            } catch (FormatException e) {
+                                Toast.makeText(context, WRITE_ERROR, Toast.LENGTH_LONG ).show();
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                })
+                .setPositiveButton("",null)
+                .create();
+        wait_dialog.show();
+
+        TextView msgTxt = (TextView) wait_dialog.findViewById(android.R.id.message);
+        msgTxt.setTextSize(64.0f);
+        Button negativeButton = ((AlertDialog)wait_dialog).getButton(DialogInterface.BUTTON_NEGATIVE);
+        negativeButton.setTextSize(64.0f);
+        negativeButton.setTextColor(Color.rgb(0,0, 0));
+        negativeButton.setBackgroundColor(Color.rgb(128,128, 128));
+
+    }
+
     // Show Message Box On Screen
     private void openOptionsDialog()
     {
-        msg_log = nfc_write_tag + " written to the NFC tag successfully!";
-        AlertDialog dialog = new AlertDialog.Builder(this)
+        nfc_dialog = new AlertDialog.Builder(this)
                 .setMessage(msg_log)
                 .setPositiveButton("OK", null)
                 .create();
-        dialog.show();
+        nfc_dialog.show();
 
-        TextView msgTxt = (TextView) dialog.findViewById(android.R.id.message);
+        TextView msgTxt = (TextView) nfc_dialog.findViewById(android.R.id.message);
         msgTxt.setTextSize(64.0f);
-        Button positiveButton = ((AlertDialog)dialog).getButton(DialogInterface.BUTTON_POSITIVE);
+        Button positiveButton = ((AlertDialog)nfc_dialog).getButton(DialogInterface.BUTTON_POSITIVE);
         positiveButton.setTextSize(64.0f);
         positiveButton.setTextColor(Color.rgb(0,0, 0));
         positiveButton.setBackgroundColor(Color.rgb(128,128, 128));
@@ -224,11 +277,11 @@ public class MainActivity extends Activity {
                 nfc_animal_tag = "dog";
                 break;
             case 2:
-                nfc_animal_tag = "bird";
+                nfc_animal_tag = "cow";
                 break;
         }
 
-        switch(select_color)
+        switch(nfc_color)
         {
             case 0:
                 nfc_color_tag = "red";
@@ -242,7 +295,7 @@ public class MainActivity extends Activity {
         }
 
         nfc_write_tag = nfc_animal_tag + "," + nfc_color_tag;
-
+        /*
         try {
             if (myTag == null) {
                 Toast.makeText(context, ERROR_DETECTED, Toast.LENGTH_LONG).show();
@@ -260,6 +313,45 @@ public class MainActivity extends Activity {
             Toast.makeText(context, WRITE_ERROR, Toast.LENGTH_LONG ).show();
             e.printStackTrace();
         }
+
+         */
+        /*
+        if(nfc_dialog == null)
+            openWaitNFCDialog();
+        else
+            nfc_dialog.show();
+
+         */
+        myTag = null;
+        msg_log = nfc_write_tag + "\nwaiting for NTag contact...";
+
+        if(wait_dialog == null)
+            openWaitNFCDialog();
+        else {
+            wait_dialog.show();
+            wait_dialog.setMessage(msg_log);
+        }
+
+        to_do_write_nfc = 0;
+
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    while(myTag == null) {
+                        sleep(500);
+                    }
+                    to_do_write_nfc = 1;
+                    wait_dialog.dismiss();
+                    //myTag = null;
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        thread.start();
+
     }
 
         /******************************************************************************

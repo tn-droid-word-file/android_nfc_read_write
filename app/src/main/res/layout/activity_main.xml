@@ -32,11 +32,11 @@
                 android:src="@drawable/dog" />
 
             <ImageButton
-                android:id="@+id/button_bird"
+                android:id="@+id/button_cow"
                 android:layout_width="426dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="right"
-                android:src="@drawable/bird" />
+                android:src="@drawable/cow" />
 
         </LinearLayout>
 
