@@ -1,6 +1,8 @@
 package com.example.peng.nfcreadwrite;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.PendingIntent;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -8,6 +10,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.nfc.FormatException;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -20,6 +23,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,7 +31,6 @@ import android.widget.ViewFlipper;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Field;
 
 public class MainActivity extends Activity {
 
@@ -44,9 +47,17 @@ public class MainActivity extends Activity {
     TextView tvNFCContent;
     TextView message;
 
-    Button btnRed;
-    Button btnBlue;
-    Button btnGreen;
+    ImageButton btnImageCat_Red;
+    ImageButton btnImageCat_Green;
+    ImageButton btnImageCat_Blue;
+
+    ImageButton btnImageDog_Red;
+    ImageButton btnImageDog_Green;
+    ImageButton btnImageDog_Blue;
+
+    ImageButton btnImageCow_Red;
+    ImageButton btnImageCow_Green;
+    ImageButton btnImageCow_Blue;
 
     ImageButton btnImageCat;
     ImageButton btnImageDog;
@@ -59,6 +70,7 @@ public class MainActivity extends Activity {
 
     String write_log;
     String msg_log;
+    String popup_msg;
 
     int select_animal;
     int select_color;
@@ -66,6 +78,9 @@ public class MainActivity extends Activity {
 
     AlertDialog nfc_dialog = null;
     AlertDialog wait_dialog = null;
+    Dialog custom_dialog = null;
+    Dialog finish_dialog = null;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -80,42 +95,21 @@ public class MainActivity extends Activity {
         btnImageCow = (ImageButton) findViewById(R.id.button_cow);
 
         viewFlipper = (ViewFlipper) findViewById(R.id.nfcFlipper);
-        btnRed = (Button) findViewById(R.id.button_red);
-        btnGreen = (Button) findViewById(R.id.button_green);
-        btnBlue = (Button) findViewById(R.id.button_blue);
 
-        btnRed.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // or you can switch selecting the layout that you want to display
-                viewFlipper.setDisplayedChild(1);
-                viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.firstLayout)));
-                select_color = 0;
-                FromUIWriteNFC(select_animal,select_color);
-            }
-        });
+        btnImageCat_Red = (ImageButton) findViewById(R.id.button_cat_red);
+        btnImageCat_Green = (ImageButton) findViewById(R.id.button_cat_green);
+        btnImageCat_Blue = (ImageButton) findViewById(R.id.button_cat_blue);
 
-        btnGreen.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // or you can switch selecting the layout that you want to display
-                viewFlipper.setDisplayedChild(1);
-                viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.firstLayout)));
-                select_color = 1;
-                FromUIWriteNFC(select_animal,select_color);
-            }
-        });
+        btnImageDog_Red = (ImageButton) findViewById(R.id.button_dog_red);
+        btnImageDog_Green = (ImageButton) findViewById(R.id.button_dog_green);
+        btnImageDog_Blue = (ImageButton) findViewById(R.id.button_dog_blue);
 
-        btnBlue.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // or you can switch selecting the layout that you want to display
-                viewFlipper.setDisplayedChild(1);
-                viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.firstLayout)));
-                select_color = 2;
-                FromUIWriteNFC(select_animal,select_color);
-            }
-        });
+        btnImageCow_Red = (ImageButton) findViewById(R.id.button_cow_red);
+        btnImageCow_Green = (ImageButton) findViewById(R.id.button_cow_green);
+        btnImageCow_Blue = (ImageButton) findViewById(R.id.button_cow_blue);
+
+        custom_dialog = new Dialog(this);
+        finish_dialog = new Dialog(this);
 
         btnImageCat.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -131,8 +125,8 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 // or you can switch selecting the layout that you want to display
-                viewFlipper.setDisplayedChild(1);
-                viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.secondLayout)));
+                viewFlipper.setDisplayedChild(2);
+                viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.thirdLayout)));
                 select_animal = 1;
             }
         });
@@ -141,9 +135,126 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 // or you can switch selecting the layout that you want to display
-                viewFlipper.setDisplayedChild(1);
-                viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.secondLayout)));
+                viewFlipper.setDisplayedChild(3);
+                viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.fourthLayout)));
                 select_animal = 2;
+            }
+        });
+
+        btnImageCat_Red.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // or you can switch selecting the layout that you want to display
+                viewFlipper.setDisplayedChild(0);
+                viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.firstLayout)));
+                select_color = 0;
+                popup_msg = "Waiting for N-Tag...";
+                openCustomDialog(this, R.drawable.cat_red);
+                FromUIWriteNFC(select_animal,select_color);
+            }
+        });
+
+        btnImageCat_Green.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // or you can switch selecting the layout that you want to display
+                viewFlipper.setDisplayedChild(0);
+                viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.firstLayout)));
+                select_color = 1;
+                popup_msg = "Waiting for N-Tag...";
+                openCustomDialog(this, R.drawable.cat_green);
+                FromUIWriteNFC(select_animal,select_color);
+            }
+        });
+
+        btnImageCat_Blue.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // or you can switch selecting the layout that you want to display
+                viewFlipper.setDisplayedChild(0);
+                viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.firstLayout)));
+                select_color = 2;
+                popup_msg = "Waiting for N-Tag...";
+                openCustomDialog(this, R.drawable.cat_blue);
+                FromUIWriteNFC(select_animal,select_color);
+            }
+        });
+
+        btnImageDog_Red.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // or you can switch selecting the layout that you want to display
+                viewFlipper.setDisplayedChild(0);
+                viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.firstLayout)));
+                select_color = 0;
+                popup_msg = "Waiting for N-Tag...";
+                openCustomDialog(this, R.drawable.dog_red);
+                FromUIWriteNFC(select_animal,select_color);
+            }
+        });
+
+        btnImageDog_Green.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // or you can switch selecting the layout that you want to display
+                viewFlipper.setDisplayedChild(0);
+                viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.firstLayout)));
+                select_color = 1;
+                popup_msg = "Waiting for N-Tag...";
+                openCustomDialog(this, R.drawable.dog_green);
+                FromUIWriteNFC(select_animal,select_color);
+            }
+        });
+
+        btnImageDog_Blue.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // or you can switch selecting the layout that you want to display
+                viewFlipper.setDisplayedChild(0);
+                viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.firstLayout)));
+                select_color = 2;
+                popup_msg = "Waiting for N-Tag...";
+                openCustomDialog(this, R.drawable.dog_blue);
+                FromUIWriteNFC(select_animal,select_color);
+            }
+        });
+
+        btnImageCow_Red.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // or you can switch selecting the layout that you want to display
+                viewFlipper.setDisplayedChild(0);
+                viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.firstLayout)));
+                select_color = 0;
+                popup_msg = "Waiting for N-Tag...";
+                openCustomDialog(this, R.drawable.cow_red);
+                FromUIWriteNFC(select_animal,select_color);
+            }
+        });
+
+        btnImageCow_Green.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // or you can switch selecting the layout that you want to display
+                viewFlipper.setDisplayedChild(0);
+                viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.firstLayout)));
+                select_color = 1;
+                popup_msg = "Waiting for N-Tag...";
+                openCustomDialog(this, R.drawable.cow_green);
+                FromUIWriteNFC(select_animal,select_color);
+            }
+        });
+
+        btnImageCow_Blue.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // or you can switch selecting the layout that you want to display
+                viewFlipper.setDisplayedChild(0);
+                viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.firstLayout)));
+                select_color = 2;
+                popup_msg = "Waiting for N-Tag...";
+                openCustomDialog(this, R.drawable.cow_blue);
+                FromUIWriteNFC(select_animal,select_color);
             }
         });
 
@@ -266,6 +377,101 @@ public class MainActivity extends Activity {
 
     }
 
+    //Custom Pop Up Window
+    @SuppressLint("ResourceType")
+    private void openCustomDialog(final View.OnClickListener v, final int image_id)
+    {
+        TextView txtmessage;
+        Button btnFollow;
+        ImageView choiceAnimal;
+
+        custom_dialog.setContentView(R.layout.custompopup);
+        txtmessage =(TextView) custom_dialog.findViewById(R.id.msgtext);
+        txtmessage.setTextSize(64.0f);
+        txtmessage.setText(popup_msg);
+        btnFollow = (Button) custom_dialog.findViewById(R.id.btncancel);
+        btnFollow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                custom_dialog.dismiss();
+            }
+        });
+        btnFollow.setTextSize(48.0f);
+        custom_dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        choiceAnimal = (ImageView) custom_dialog.findViewById(R.id.iv_animal);
+        if(choiceAnimal != null)
+            choiceAnimal.setImageResource(image_id);
+
+        custom_dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                if(to_do_write_nfc == 1)
+                {
+                    try {
+                        if (myTag == null) {
+                            Toast.makeText(context, ERROR_DETECTED, Toast.LENGTH_LONG).show();
+                        } else {
+                            //write(message.getText().toString(), myTag);
+                            write(nfc_write_tag, myTag);
+                            //Toast.makeText(context, WRITE_SUCCESS, Toast.LENGTH_LONG ).show();
+                            write_log = WRITE_SUCCESS;
+                            msg_log = nfc_write_tag + " written to the NFC tag successfully!";
+                            /*
+                            if(nfc_dialog == null)
+                                openOptionsDialog();
+                            else {
+                                nfc_dialog.setMessage(msg_log);
+                                nfc_dialog.show();
+                            }
+                            */
+                            popup_msg = "Successfully!";
+                            openFinishDialog(v, image_id);
+
+                        }
+                    } catch (IOException e) {
+                        Toast.makeText(context, WRITE_ERROR, Toast.LENGTH_LONG ).show();
+                        e.printStackTrace();
+                    } catch (FormatException e) {
+                        Toast.makeText(context, WRITE_ERROR, Toast.LENGTH_LONG ).show();
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        custom_dialog.show();
+    }
+
+    //Custom Pop Up Finish Window
+    @SuppressLint("ResourceType")
+    private void openFinishDialog(View.OnClickListener v, int image_id)
+    {
+        TextView txt_finish;
+        Button btn_finish;
+        ImageView finish_Animal;
+
+        finish_dialog.setContentView(R.layout.customfinish);
+        txt_finish =(TextView) finish_dialog.findViewById(R.id.finishtext);
+        txt_finish.setTextSize(64.0f);
+        txt_finish.setText(popup_msg);
+        btn_finish = (Button) finish_dialog.findViewById(R.id.finish_cancel);
+        btn_finish.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish_dialog.dismiss();
+            }
+        });
+        btn_finish.setTextSize(48.0f);
+        finish_dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        finish_Animal = (ImageView) finish_dialog.findViewById(R.id.finish_animal);
+        if(finish_Animal != null)
+            finish_Animal.setImageResource(image_id);
+
+        finish_dialog.show();
+    }
+
+
     // Write label to NFC tag
     private void FromUIWriteNFC(int nfc_animal, int nfc_color) {
         switch(nfc_animal)
@@ -322,16 +528,9 @@ public class MainActivity extends Activity {
             nfc_dialog.show();
 
          */
+
+
         myTag = null;
-        msg_log = nfc_write_tag + "\nwaiting for NTag contact...";
-
-        if(wait_dialog == null)
-            openWaitNFCDialog();
-        else {
-            wait_dialog.show();
-            wait_dialog.setMessage(msg_log);
-        }
-
         to_do_write_nfc = 0;
 
         Thread thread = new Thread() {
@@ -342,7 +541,7 @@ public class MainActivity extends Activity {
                         sleep(500);
                     }
                     to_do_write_nfc = 1;
-                    wait_dialog.dismiss();
+                    custom_dialog.dismiss();
                     //myTag = null;
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -351,7 +550,6 @@ public class MainActivity extends Activity {
         };
 
         thread.start();
-
     }
 
         /******************************************************************************
@@ -391,7 +589,7 @@ public class MainActivity extends Activity {
         }
 
         //tvNFCContent.setText("NFC Content: " + text);
-        Toast.makeText(context, text, Toast.LENGTH_LONG ).show();
+        //Toast.makeText(context, text, Toast.LENGTH_LONG ).show();
     }
 
 

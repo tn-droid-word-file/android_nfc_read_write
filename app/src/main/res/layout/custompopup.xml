@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="600dp"
+    android:layout_height="600dp"
+    android:background="@color/black"
+    android:padding="15dp"
+    android:layout_gravity="center">
+
+    <TextView
+        android:id="@+id/msgtext"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:textColor="@color/white"
+        android:text=""
+        android:textStyle="bold"
+        android:layout_gravity="clip_horizontal"
+        android:gravity="center" />
+
+    <ImageView
+        android:layout_marginTop="15sp"
+        android:id="@+id/iv_animal"
+        android:layout_width="213dp"
+        android:layout_height="360dp"
+        android:scaleType="centerCrop"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@color/black" />
+
+    <Button
+        android:id="@+id/btncancel"
+        android:layout_width="213dp"
+        android:layout_height="80dp"
+        android:text="Cancel"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@color/black"/>
+
+</LinearLayout>

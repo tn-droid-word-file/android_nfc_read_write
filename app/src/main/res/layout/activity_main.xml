@@ -46,26 +46,84 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="0sp">
 
-            <Button
-                android:id="@+id/button_red"
+            <ImageButton
+                android:id="@+id/button_cat_red"
                 android:layout_width="426dp"
-                android:layout_height="720dp"
-                android:background="#FF0000"
-                android:text="" />
+                android:layout_height="match_parent"
+                android:layout_gravity="left"
+                android:src="@drawable/cat_red" />
 
-            <Button
-                android:id="@+id/button_green"
+            <ImageButton
+                android:id="@+id/button_cat_green"
                 android:layout_width="426dp"
-                android:layout_height="720dp"
-                android:background="#00FF00"
-                android:text="" />
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:src="@drawable/cat_green" />
 
-            <Button
-                android:id="@+id/button_blue"
+            <ImageButton
+                android:id="@+id/button_cat_blue"
                 android:layout_width="426dp"
-                android:layout_height="720dp"
-                android:background="#0000FF"
-                android:text="" />
+                android:layout_height="match_parent"
+                android:layout_gravity="right"
+                android:src="@drawable/cat_blue" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/thirdLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0sp">
+
+            <ImageButton
+                android:id="@+id/button_dog_red"
+                android:layout_width="426dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="left"
+                android:src="@drawable/dog_red" />
+
+            <ImageButton
+                android:id="@+id/button_dog_green"
+                android:layout_width="426dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:src="@drawable/dog_green" />
+
+            <ImageButton
+                android:id="@+id/button_dog_blue"
+                android:layout_width="426dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="right"
+                android:src="@drawable/dog_blue" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/fourthLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0sp">
+
+            <ImageButton
+                android:id="@+id/button_cow_red"
+                android:layout_width="426dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="left"
+                android:src="@drawable/cow_red" />
+
+            <ImageButton
+                android:id="@+id/button_cow_green"
+                android:layout_width="426dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:src="@drawable/cow_green" />
+
+            <ImageButton
+                android:id="@+id/button_cow_blue"
+                android:layout_width="426dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="right"
+                android:src="@drawable/cow_blue" />
 
         </LinearLayout>
 
