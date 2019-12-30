@@ -36,7 +36,7 @@ public class MainActivity extends Activity {
 
     public static final String ERROR_DETECTED = "No NFC tag detected!";
     public static final String WRITE_SUCCESS = "Text written to the NFC tag successfully!";
-    public static final String WRITE_ERROR = "Error during writing, is the NFC tag close enough to your device?";
+    public static final String WRITE_ERROR = "Error during writing";
     NfcAdapter nfcAdapter;
     PendingIntent pendingIntent;
     IntentFilter writeTagFilters[];
@@ -71,6 +71,7 @@ public class MainActivity extends Activity {
     String write_log;
     String msg_log;
     String popup_msg;
+    String finish_msg;
 
     int select_animal;
     int select_color;
@@ -111,6 +112,9 @@ public class MainActivity extends Activity {
         custom_dialog = new Dialog(this);
         finish_dialog = new Dialog(this);
 
+        popup_msg = "Waiting for NFC to contact...";
+        finish_msg = "Successfully!";
+
         btnImageCat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -148,7 +152,6 @@ public class MainActivity extends Activity {
                 viewFlipper.setDisplayedChild(0);
                 viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.firstLayout)));
                 select_color = 0;
-                popup_msg = "Waiting for N-Tag...";
                 openCustomDialog(this, R.drawable.cat_red);
                 FromUIWriteNFC(select_animal,select_color);
             }
@@ -161,7 +164,6 @@ public class MainActivity extends Activity {
                 viewFlipper.setDisplayedChild(0);
                 viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.firstLayout)));
                 select_color = 1;
-                popup_msg = "Waiting for N-Tag...";
                 openCustomDialog(this, R.drawable.cat_green);
                 FromUIWriteNFC(select_animal,select_color);
             }
@@ -174,7 +176,6 @@ public class MainActivity extends Activity {
                 viewFlipper.setDisplayedChild(0);
                 viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.firstLayout)));
                 select_color = 2;
-                popup_msg = "Waiting for N-Tag...";
                 openCustomDialog(this, R.drawable.cat_blue);
                 FromUIWriteNFC(select_animal,select_color);
             }
@@ -187,7 +188,6 @@ public class MainActivity extends Activity {
                 viewFlipper.setDisplayedChild(0);
                 viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.firstLayout)));
                 select_color = 0;
-                popup_msg = "Waiting for N-Tag...";
                 openCustomDialog(this, R.drawable.dog_red);
                 FromUIWriteNFC(select_animal,select_color);
             }
@@ -200,7 +200,6 @@ public class MainActivity extends Activity {
                 viewFlipper.setDisplayedChild(0);
                 viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.firstLayout)));
                 select_color = 1;
-                popup_msg = "Waiting for N-Tag...";
                 openCustomDialog(this, R.drawable.dog_green);
                 FromUIWriteNFC(select_animal,select_color);
             }
@@ -213,7 +212,6 @@ public class MainActivity extends Activity {
                 viewFlipper.setDisplayedChild(0);
                 viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.firstLayout)));
                 select_color = 2;
-                popup_msg = "Waiting for N-Tag...";
                 openCustomDialog(this, R.drawable.dog_blue);
                 FromUIWriteNFC(select_animal,select_color);
             }
@@ -226,7 +224,6 @@ public class MainActivity extends Activity {
                 viewFlipper.setDisplayedChild(0);
                 viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.firstLayout)));
                 select_color = 0;
-                popup_msg = "Waiting for N-Tag...";
                 openCustomDialog(this, R.drawable.cow_red);
                 FromUIWriteNFC(select_animal,select_color);
             }
@@ -239,7 +236,6 @@ public class MainActivity extends Activity {
                 viewFlipper.setDisplayedChild(0);
                 viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.firstLayout)));
                 select_color = 1;
-                popup_msg = "Waiting for N-Tag...";
                 openCustomDialog(this, R.drawable.cow_green);
                 FromUIWriteNFC(select_animal,select_color);
             }
@@ -252,7 +248,6 @@ public class MainActivity extends Activity {
                 viewFlipper.setDisplayedChild(0);
                 viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.firstLayout)));
                 select_color = 2;
-                popup_msg = "Waiting for N-Tag...";
                 openCustomDialog(this, R.drawable.cow_blue);
                 FromUIWriteNFC(select_animal,select_color);
             }
@@ -425,16 +420,19 @@ public class MainActivity extends Activity {
                                 nfc_dialog.show();
                             }
                             */
-                            popup_msg = "Successfully!";
                             openFinishDialog(v, image_id);
 
                         }
                     } catch (IOException e) {
-                        Toast.makeText(context, WRITE_ERROR, Toast.LENGTH_LONG ).show();
-                        e.printStackTrace();
+                        //Toast.makeText(context, WRITE_ERROR, Toast.LENGTH_LONG ).show();
+                        //e.printStackTrace();
+                        openCustomDialog(v, image_id);
+                        FromUIWriteNFC(select_animal,select_color);
                     } catch (FormatException e) {
-                        Toast.makeText(context, WRITE_ERROR, Toast.LENGTH_LONG ).show();
-                        e.printStackTrace();
+                        //Toast.makeText(context, WRITE_ERROR, Toast.LENGTH_LONG ).show();
+                        //e.printStackTrace();
+                        openCustomDialog(v, image_id);
+                        FromUIWriteNFC(select_animal,select_color);
                     }
                 }
             }
@@ -453,7 +451,7 @@ public class MainActivity extends Activity {
         finish_dialog.setContentView(R.layout.customfinish);
         txt_finish =(TextView) finish_dialog.findViewById(R.id.finishtext);
         txt_finish.setTextSize(64.0f);
-        txt_finish.setText(popup_msg);
+        txt_finish.setText(finish_msg);
         btn_finish = (Button) finish_dialog.findViewById(R.id.finish_cancel);
         btn_finish.setOnClickListener(new View.OnClickListener() {
             @Override
