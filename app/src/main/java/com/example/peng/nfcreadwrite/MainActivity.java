@@ -112,7 +112,7 @@ public class MainActivity extends Activity {
         custom_dialog = new Dialog(this);
         finish_dialog = new Dialog(this);
 
-        popup_msg = "Waiting for NFC to contact...";
+        popup_msg = "Waitting for NFC to contact...";
         finish_msg = "Successfully!";
 
         btnImageCat.setOnClickListener(new View.OnClickListener() {
@@ -408,20 +408,15 @@ public class MainActivity extends Activity {
                             Toast.makeText(context, ERROR_DETECTED, Toast.LENGTH_LONG).show();
                         } else {
                             //write(message.getText().toString(), myTag);
-                            write(nfc_write_tag, myTag);
-                            //Toast.makeText(context, WRITE_SUCCESS, Toast.LENGTH_LONG ).show();
-                            write_log = WRITE_SUCCESS;
-                            msg_log = nfc_write_tag + " written to the NFC tag successfully!";
-                            /*
-                            if(nfc_dialog == null)
-                                openOptionsDialog();
-                            else {
-                                nfc_dialog.setMessage(msg_log);
-                                nfc_dialog.show();
+                            if(write(nfc_write_tag, myTag)) {
+                                //Toast.makeText(context, WRITE_SUCCESS, Toast.LENGTH_LONG ).show();
+                                write_log = WRITE_SUCCESS;
+                                msg_log = nfc_write_tag + " written to the NFC tag successfully!";
+                                openFinishDialog(v, image_id);
+                            } else {
+                                openCustomDialog(v, image_id);
+                                FromUIWriteNFC(select_animal,select_color);
                             }
-                            */
-                            openFinishDialog(v, image_id);
-
                         }
                     } catch (IOException e) {
                         //Toast.makeText(context, WRITE_ERROR, Toast.LENGTH_LONG ).show();
@@ -527,8 +522,18 @@ public class MainActivity extends Activity {
 
          */
 
+        try {
+            if (myTag != null) {
+                if(write(nfc_write_tag, myTag) == false) {
+                    myTag = null;
+                }
+            }
+        } catch (IOException e) {
+            myTag = null;
+        } catch (FormatException e) {
+            myTag = null;
+        }
 
-        myTag = null;
         to_do_write_nfc = 0;
 
         Thread thread = new Thread() {
@@ -594,18 +599,26 @@ public class MainActivity extends Activity {
     /******************************************************************************
      **********************************Write to NFC Tag****************************
      ******************************************************************************/
-    private void write(String text, Tag tag) throws IOException, FormatException {
+    private boolean write(String text, Tag tag) throws IOException, FormatException {
         NdefRecord[] records = { createRecord(text) };
         NdefMessage message = new NdefMessage(records);
         // Get an instance of Ndef for the tag.
         Ndef ndef = Ndef.get(tag);
-        // Enable I/O
-        ndef.connect();
-        // Write the message
-        ndef.writeNdefMessage(message);
-        // Close the connection
-        ndef.close();
+
+        if(ndef != null) {
+            // Enable I/O
+            ndef.connect();
+            // Write the message
+            ndef.writeNdefMessage(message);
+            // Close the connection
+            ndef.close();
+        }
+        else {
+            return  false;
+        }
+        return  true;
     }
+
     private NdefRecord createRecord(String text) throws UnsupportedEncodingException {
         String lang       = "en";
         byte[] textBytes  = text.getBytes();
